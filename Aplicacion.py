@@ -28,8 +28,14 @@ def menu():
     opcion=int(input("Digite la opcion que desea: "))
     if opcion==1:
         registrar()
+    elif opcion==2:
+        eliminar()
+    elif opcion==3:
+        editar()
     elif opcion==4:
         listar()
+    elif opcion==5:
+        print("Adios")
 
 def listar():
     conexion=sqlite3.connect("SAIRA_almacen.db")
@@ -40,11 +46,9 @@ def listar():
     records = cursor.fetchall()
     print("Total de productos registrados:  ", len(records))
     print("Esta es la lista de productos")
-    for row in records:
-        print("Id: ", row[0])
-        print("Codigo: ", row[1])
-        print("Nombre: ",row[2])
-        print("Precio: ",row[3])
+    print("\nId     Codigo    Nombre     Precio")
+    for row in records:        
+        print(row[0],"\t",row[1],"\t",row[2],"\t",row[3])
         print("\n")
     conexion.commit()
     conexion.close()
@@ -58,5 +62,32 @@ def registrar():
     conexion.execute("insert into producto(codigo,nombre,precio) values (?,?,?)", (codigo,nombre,precio))
     conexion.commit()
     conexion.close()
+
+def eliminar():
+    conexion=sqlite3.connect("SAIRA_almacen.db")
+    cursor=conexion.cursor()
+    id_producto=input("Ingrese el id del producto a eliminar: ")
+    consulta="DELETE FROM producto WHERE idproducto=?"
+    cursor.executemany(consulta,(id_producto))
+    conexion.commit()
+    conexion.close()
+
+def editar():
+    conexion=sqlite3.connect("SAIRA_almacen.db")
+    cursor=conexion.cursor()
+    idpro=int(input("Ingrese el id del producto a modificar: "))
+    codex=input("Ingrese el nuevo codigo del producto:")
+    nombre=input("Ingrese el nuevo nombre del producto:")
+    precio=float(input("Ingrese el nuevo precio del producto:"))
+    consulta="""UPDATE producto
+            SET
+                codigo=?,nombre=?,precio=?
+            WHERE
+                idproducto=?
+                """
+    cursor.execute(consulta,(codex,nombre,precio,idpro))
+    conexion.commit()
+    conexion.close()
+
     
 menu()
